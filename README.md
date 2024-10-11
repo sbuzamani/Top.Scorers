@@ -9,6 +9,8 @@ REST Api side of the project to add person, get by id, and get top scorers
 Console App is used to see the top scorers names and the top score from the csv file.
 
 Both Client applications make use of the PersonService to access exclusively person related functions
+### Running Application
+Set either the Console or Api project to the start up project and run it. Also ensure that you have added the TestData.csv added to the projects.
 
 # Desgin
 The design of the solution follows a layered architecture, onion, hexagonal. Making it easy to change out data sources or add other expansion packages.
