@@ -1,4 +1,5 @@
 ﻿using Moq;
+using Top.Scorers.Data;
 using Top.Scorers.Domain.Interfaces;
 using Top.Scorers.Domain.Models;
 using Top.Scorers.Domain.Services;
@@ -8,17 +9,18 @@ namespace Top.Scorers.Tests
     public class PersonServiceTests
     {
         private IPersonService _personService;
-        private Mock<ICsvHandler> _csvHandler;
+        private Mock<ICsvHandler> _mockCsvHandler;
+        private Mock<IPersonRepository> _mockPersonRepository;
         public PersonServiceTests()
         {
-            _csvHandler = new Mock<ICsvHandler>();
-            _personService = new PersonService(_csvHandler.Object);
+            _mockCsvHandler = new Mock<ICsvHandler>();
+            _mockPersonRepository = new Mock<IPersonRepository>();
+            _personService = new PersonService(_mockCsvHandler.Object, _mockPersonRepository.Object);
         }
         [Fact]
         public void GetAll_ValidInputList_ReturnsListOfPeople()
         {
-            var stringList = new List<string> { "Name,Surname,Score", "Kudu, Zela, 99"};
-            _csvHandler.Setup(x => x.Read()).Returns(stringList);
+            _mockCsvHandler.Setup(x => x.Read()).Returns(ObjectMother.GetStringList());
             var result = _personService.GetAll();
             Assert.NotEmpty(result);
             Assert.IsType<List<Person>>(result);
@@ -26,8 +28,7 @@ namespace Top.Scorers.Tests
         [Fact]
         public void GetTop_ValidList_ReturnsTopResult()
         {
-            var stringList = new List<string> { "Name,Surname,Score", "Kudu, Zela, 99", "Max, Keeble, 100, Dan, The Man, 80" };
-            _csvHandler.Setup(x => x.Read()).Returns(stringList);
+            _mockCsvHandler.Setup(x => x.Read()).Returns(ObjectMother.GetStringList());
             var result = _personService.GetTop();
             Assert.Single(result);
             Assert.IsType<List<Person>>(result);
@@ -35,8 +36,7 @@ namespace Top.Scorers.Tests
         [Fact]
         public void PrintTop_ValidList_ReturnsSingleStringToPrint()
         {
-            var stringList = new List<string> { "Name,Surname,Score", "Kudu, Zela, 99", "Max, Keeble, 100, Dan, The Man, 80" };
-            _csvHandler.Setup(x => x.Read()).Returns(stringList);
+            _mockCsvHandler.Setup(x => x.Read()).Returns(ObjectMother.GetStringList());
             var result = _personService.PrintTop();
             Assert.NotEmpty(result);
             Assert.Contains("Max", result);
@@ -46,6 +46,7 @@ namespace Top.Scorers.Tests
         [Fact]
         public void Get_ValidId_ReturnsValidPerson()
         {
+            _mockPersonRepository.Setup(x => x.GetPerson(It.IsAny<int>())).Returns(ObjectMother.GetPerson());
             var result = _personService.Get(2);
             Assert.NotNull(result);
             Assert.IsType<Person>(result);

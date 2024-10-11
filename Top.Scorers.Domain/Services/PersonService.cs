@@ -20,10 +20,10 @@ namespace Top.Scorers.Domain.Services
             var stringList = _csvHandler.Read();
             var people = new List<Person>();
 
-            foreach (var person in stringList.Skip(1))
+            foreach (var person in stringList.Skip(1))//Assuming that the first row will be always be heading
             {
                 var x = person.Split(',');
-                var y = new Person { FirstName = x[0], LastName = x[1], Score = int.Parse(x[2]) };
+                var y = new Person { FirstName = x[0], LastName = x[1], Score = int.Parse(x[2]) };//Assuming that score will always be int value
 
                 people.Add(y);
             }
@@ -35,8 +35,8 @@ namespace Top.Scorers.Domain.Services
         {
             var people = GetAll();
             var maxScore = people.Max(x => x.Score);
-            var top = people.OrderBy(x => x.FirstName).Where(x => x.Score == maxScore).Select(y => y).ToList();
-            return top;
+            var result = people.OrderBy(x => x.FirstName).Where(x => x.Score == maxScore).Select(y => y).ToList();
+            return result;
         }
 
         public string PrintTop()
@@ -57,7 +57,7 @@ namespace Top.Scorers.Domain.Services
             var result = _personRepository.GetPerson(id);
             if (result == null)
             {
-                return new Person();
+                return null;
             }
 
             return MapFromEntity(result);
@@ -71,7 +71,7 @@ namespace Top.Scorers.Domain.Services
             return result;
         }
 
-        private Person MapFromEntity(Top.Scorers.Data.Entities.Person person)
+        private Person MapFromEntity(Data.Entities.Person person)
         {
             return new Person
             {
@@ -81,9 +81,9 @@ namespace Top.Scorers.Domain.Services
             };
         }
 
-        private Top.Scorers.Data.Entities.Person MapToEntity(Person person)
+        private Data.Entities.Person MapToEntity(Person person)
         {
-            return new Top.Scorers.Data.Entities.Person
+            return new Data.Entities.Person
             {
                 FirstName = person.FirstName,
                 LastName = person.LastName,
